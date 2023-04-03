@@ -370,3 +370,39 @@ DEFINE_HOOK(0x51EAF2, TechnoClass_WhatAction_AllowAirstrike, 0x6)
 	return SkipGameCode;
 }
 
+DEFINE_HOOK(0x706440, TechnoClass_Draw_SHP, 0x8)
+{
+	GET(TechnoClass*, pTechno, ESI);
+	GET(BlitterFlags, Flags, EDX);
+
+	if (pTechno->CurrentMission == Mission::Construction)
+	{
+		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
+		{
+			int frameBld = pBld->GetCurrentFrame(); // NACNST 0-29
+
+			if (frameBld < 15)
+				Flags |= BlitterFlags::TransLucent75;
+			else if (frameBld < 22)
+				Flags |= BlitterFlags::TransLucent50;
+			else
+				Flags |= BlitterFlags::TransLucent25;
+
+			R->EDX(Flags);
+
+			/*
+			if (auto pSHP = pBld->Type->Buildup)
+			{
+				int frameIdx = pSHP->Frames / 2 - 1;
+
+				if (frameIdx < 0)
+					frameIdx = 0;
+
+				R->ECX(frameIdx);
+			}
+			*/
+		}
+	}
+
+	return 0;
+}

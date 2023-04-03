@@ -12,6 +12,7 @@
 #include <Misc/FlyingStrings.h>
 #include <New/Entity/BannerClass.h>
 #include <Utilities/Debug.h>
+#include <FPSCounter.h>
 
 DEFINE_HOOK(0x777C41, UI_ApplyAppIcon, 0x9)
 {
@@ -321,4 +322,36 @@ DEFINE_HOOK(0x6DA215, TacticalClass_Render_DrawDraggingRect, 0x9)
 	}
 
 	return 0x6DA221;
+}
+
+DEFINE_HOOK(0x4F4583, GScreenClass_DrawText_FPS, 0x6)
+{
+	wchar_t text1[0x10];
+	swprintf_s(text1, L" FPS: %-4u", FPSCounter::CurrentFrameRate());
+	wchar_t text2[0x10];
+	swprintf_s(text2, L" Avg: %.2f", FPSCounter::GetAverageFrameRate());
+
+	RectangleStruct rectText = Drawing::GetTextDimensions(text2, { 0, 0 }, 0, 2, 0);
+
+	int Height = DSurface::Composite->GetHeight();
+	RectangleStruct rect = { 0, Height - 32 - rectText.Height * 2 - 2, rectText.Width, rectText.Height * 2 + 2 };
+
+	ColorStruct color = { 0, 0, 0 };
+
+	DSurface::Composite->FillRectTrans(&rect, color, 30);
+
+	Point2D pos1 = { 0, rect.Y + 2 };
+	Point2D pos2 = { 0, pos1.Y + rectText.Height };
+
+	COLORREF colorText = COLOR_GREEN;
+	int fps = FPSCounter::CurrentFrameRate();
+	if (fps < 20)
+		colorText = COLOR_RED;
+	else if (fps < 40)
+		colorText = COLOR_YELLOW;
+
+	DSurface::Composite->DrawTextA(text1, &DSurface::ViewBounds, &pos1, colorText, 0, TextPrintType::NoShadow);
+	DSurface::Composite->DrawTextA(text2, &DSurface::ViewBounds, &pos2, colorText, 0, TextPrintType::NoShadow);
+
+	return 0;
 }

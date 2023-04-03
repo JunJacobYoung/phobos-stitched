@@ -298,3 +298,27 @@ DEFINE_HOOK(0x456776, BuildingClass_DrawRadialIndicator_Visibility, 0x6)
 
 	return DoNotDraw;
 }
+
+DEFINE_HOOK(0x6DA215, TacticalClass_Render_DrawDraggingRect, 0x9)
+{
+	GET(RectangleStruct*, pRect, EAX);
+
+	ColorStruct color = { 50, 100, 150 };
+	DSurface::Composite->FillRectTrans(pRect, color, 40);
+
+	Point2D points[4] = {
+		{ pRect->X, pRect->Y },
+		{ pRect->X, pRect->Y + pRect->Height },
+		{ pRect->X + pRect->Width, pRect->Y + pRect->Height },
+		{ pRect->X + pRect->Width, pRect->Y }
+	};
+
+	bool PatternMove = false;
+
+	for (int i = 0; i < 4; i++)
+	{
+		DSurface::Composite->DrawDashedLine(&points[i], &points[(i + 1) % 4], COLOR_WHITE, &PatternMove, 0);
+	}
+
+	return 0x6DA221;
+}

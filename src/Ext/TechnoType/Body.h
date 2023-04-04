@@ -655,6 +655,8 @@ public:
 		Valueable<int> FallRate_NoParachute;
 		Nullable<int> FallRate_NoParachuteMax;
 
+		Valueable<double> AttackIndicator_Range;
+
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, HealthBar_Hide { false }
 			, UIDescription {}
@@ -1104,6 +1106,8 @@ public:
 
 			, FallRate_NoParachute { 1 }
 			, FallRate_NoParachuteMax {}
+
+			, AttackIndicator_Range { -1 }
 		{ }
 
 		virtual ~ExtData() = default;

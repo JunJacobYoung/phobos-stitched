@@ -1645,6 +1645,8 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 
 	this->Passengers_BySize.Read(exINI, pSection, "Passengers.BySize");
 
+	this->AttackIndicator_Range.Read(exINI, pSection, "AttackIndicator.Range");
+
 	// Art tags
 	INI_EX exArtINI(CCINIClass::INI_Art);
 	auto pArtSection = pThis->ImageFile;
@@ -2265,6 +2267,8 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 
 		.Process(this->FallRate_NoParachute)
 		.Process(this->FallRate_NoParachuteMax)
+
+		.Process(this->AttackIndicator_Range)
 		;
 
 	Stm

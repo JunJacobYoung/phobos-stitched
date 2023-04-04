@@ -15,6 +15,8 @@
 
 #include <New/Type/TemperatureTypeClass.h>
 
+#include <WWMouseClass.h>
+
 inline void Subset_1(TechnoClass* pThis, TechnoTypeClass* pType, TechnoExt::ExtData* pExt, TechnoTypeExt::ExtData* pTypeExt)
 {
 	pExt->EatPassengers();
@@ -1621,4 +1623,47 @@ DEFINE_HOOK(0x73E411, UnitClass_Mission_Unload_DumpAmount, 0x7)
 	var.Y = *(int*)&dumpAmount;
 
 	return 0x73E42B;
+}
+
+DEFINE_HOOK(0x6D4748, TacticalClass_Render_Selected, 0x6)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	const auto pTypeExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
+
+	if (pTypeExt->AttackIndicator_Range > 0)
+	{
+		double range = pTypeExt->AttackIndicator_Range;
+
+		MouseCursorType idxCursor = MouseClass::Instance->MouseCursorIndex;
+
+		switch (idxCursor)
+		{
+		case MouseCursorType::Attack:
+		{
+			Point2D posCursor = { WWMouseClass::Instance->GetX(), WWMouseClass::Instance->GetY() };
+			DSurface::Composite->DrawEllipse(posCursor.X, posCursor.Y, range, COLOR_RED);
+
+			double ratio = Unsorted::CurrentFrame % 60 / 60.0;
+			DSurface::Composite->DrawEllipse(posCursor.X, posCursor.Y, range * ratio, COLOR_RED);
+
+			double ratio2 = (Unsorted::CurrentFrame + 30) % 60 / 60.0;
+			DSurface::Composite->DrawEllipse(posCursor.X, posCursor.Y, range * ratio2, COLOR_RED);
+
+			break;
+		}
+		case MouseCursorType::AttackOutOfRange:
+		{
+			Point2D posCursor = { WWMouseClass::Instance->GetX(), WWMouseClass::Instance->GetY() };
+			DSurface::Composite->DrawEllipse(posCursor.X, posCursor.Y, range, COLOR_YELLOW);
+			break;
+		}
+		case MouseCursorType::Default:
+			break;
+		default:
+			break;
+		}
+	}
+
+	return 0;
 }

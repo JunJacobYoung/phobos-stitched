@@ -135,6 +135,8 @@ public:
 		ValueableVector<int> UnitFall_DestoryHeights;
 		ValueableVector<bool> UnitFall_AlwaysFalls;
 
+		Valueable<double> SW_ShowHealthBar_Range;
+
 		virtual void InitializeConstants();
 
 		ExtData(SuperWeaponTypeClass* OwnerObject) : Extension<SuperWeaponTypeClass>(OwnerObject)
@@ -242,6 +244,8 @@ public:
 			, UnitFall_Destorys {}
 			, UnitFall_DestoryHeights {}
 			, UnitFall_AlwaysFalls {}
+
+			, SW_ShowHealthBar_Range { -1.0 }
 		{ }
 
 		// Ares 0.A functions

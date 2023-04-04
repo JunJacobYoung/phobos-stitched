@@ -567,3 +567,33 @@ DEFINE_HOOK(0x6DC353, TacticalClass_Render_SW_SquaredRange_Multi, 0x6)
 
 	return 0;
 }
+
+DEFINE_HOOK(0x6F5E37, TechnoClass_DrawExtras_AimedBySW, 0x6)
+{
+	GET(TechnoClass*, pThis, EBP);
+
+	enum { DrawHealthBar = 0x6F5E4B };
+
+	int idx = Unsorted::CurrentSWType;
+
+	if (idx == -1 || pThis->Owner == HouseClass::CurrentPlayer)
+		return 0;
+
+	const auto pSWType = SuperWeaponTypeClass::Array->GetItem(idx);
+	const auto pTypeExt = SWTypeExt::ExtMap.Find(pSWType);
+
+	double range = pTypeExt->SW_ShowHealthBar_Range;
+	if (range > 0)
+	{
+		CellStruct nDisplayCell = Make_Global<CellStruct>(0x88095C);
+		CellStruct nDisplayCell_Offset = Make_Global<CellStruct>(0x880960);
+		CellStruct nCellCursor = nDisplayCell + nDisplayCell_Offset;
+
+		CellStruct nCellTechno = pThis->GetMapCoords();
+
+		if (nCellCursor.DistanceFrom(nCellTechno) < range)
+			return DrawHealthBar;
+	}
+
+	return 0;
+}

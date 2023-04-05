@@ -135,6 +135,8 @@ public:
 
 		Valueable<int> RallyRange;
 
+		Nullable<BuildingTypeClass*> ToggleBuildingType;
+
 		//Ares
 		Valueable<bool> Factory_ExplicitOnly;
 
@@ -251,6 +253,8 @@ public:
 			, LeaveBioReactorSound {}
 
 			, RallyRange { -1 }
+
+			, ToggleBuildingType {}
 		{ }
 
 		// Ares 0.A functions

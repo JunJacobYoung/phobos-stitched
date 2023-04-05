@@ -406,3 +406,16 @@ DEFINE_HOOK(0x706440, TechnoClass_Draw_SHP, 0x8)
 
 	return 0;
 }
+
+/*
+DEFINE_HOOK(0x4ABB50, DisplayClass_LeftMouseButtonUp_BeforeNetworkPlace, 0x5)
+{
+	const auto pBld = DisplayClass::Instance->CurrentBuilding;
+	const auto pBldType = DisplayClass::Instance->CurrentBuildingType;
+
+	Debug::LogAndMessage("pBld: %s\n", pBld->GetTechnoType()->ID);
+	Debug::LogAndMessage("pBldType: %s\n", pBldType->ID);
+
+	return 0;
+}
+*/

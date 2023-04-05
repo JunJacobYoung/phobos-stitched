@@ -4585,6 +4585,9 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->UnitFallDestoryHeight)
 
 		.Process(this->Landed)
+
+		.Process(this->VoxelSizeRatio)
+		.Process(this->expand)
 		;
 }
 

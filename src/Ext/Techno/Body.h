@@ -306,6 +306,9 @@ public:
 
 		bool Landed = true;
 
+		double VoxelSizeRatio = -1.0;
+		bool expand = false;
+
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
 		{ }
 

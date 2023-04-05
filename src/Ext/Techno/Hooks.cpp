@@ -256,6 +256,28 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 		TechnoExt::SelectSW(pThis, pTypeExt);
 	}
 
+	double ratio = pExt->VoxelSizeRatio;
+	if (ratio > 0)
+	{
+		if (ratio < 0.6)
+			pExt->expand = true;
+
+		bool expand = pExt->expand;
+
+		if (expand)
+		{
+			if (ratio > 4.0)
+			{
+				int damage = pThis->Health + 1;
+				pThis->ReceiveDamage(&damage, 0, RulesClass::Instance->C4Warhead, nullptr, true, true, pThis->Owner);
+			}
+			else
+				pExt->VoxelSizeRatio += 0.04;
+		}
+		else
+			pExt->VoxelSizeRatio -= 0.01;
+	}
+
 	return 0;
 }
 
@@ -1662,6 +1684,31 @@ DEFINE_HOOK(0x6D4748, TacticalClass_Render_Selected, 0x6)
 			break;
 		default:
 			break;
+		}
+	}
+
+	return 0;
+}
+
+// hooks from secsome
+DEFINE_HOOK_AGAIN(0x73C2B8, UnitClass_DrawAsVXL_DrawMatrix, 0x8) // Shadow
+DEFINE_HOOK(0x73B5CE, UnitClass_DrawAsVXL_DrawMatrix, 0x8) // Body
+{
+	GET(UnitClass*, pThis, EBP);
+	GET(Matrix3D*, pMat, EAX);
+
+	const auto pExt = pThis ? TechnoExt::ExtMap.Find(pThis) : nullptr;
+
+	if (pExt)
+	{
+		double ratio = pExt->VoxelSizeRatio;
+		if (ratio > 0)
+		{
+			Matrix3D pMat2 = Matrix3D(*pMat);
+			pMat2.Scale(ratio);
+			R->EAX(&pMat2);
+			pMat = &pMat2;
+			pThis->UpdatePlacement(PlacementType::Redraw);
 		}
 	}
 

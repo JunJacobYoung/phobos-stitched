@@ -308,6 +308,8 @@ public:
 		Valueable<int> AntiGravity_ConnectSW_DestoryHeight;
 		Valueable<bool> AntiGravity_ConnectSW_AlwaysFall;
 
+		Valueable<bool> BreakVxl;
+
 		// Ares tags
 		// http://ares-developers.github.io/Ares-docs/new/warheads/general.html
 		ValueableVector<double> Verses;
@@ -611,6 +613,8 @@ public:
 			, AntiGravity_ConnectSW_DestoryHeight { -1 }
 			, AntiGravity_ConnectSW_AlwaysFall { false }
 
+			, BreakVxl { false }
+
 			, Verses(11)
 			, Versus {}
 			, Versus_Retaliate {}
@@ -676,6 +680,7 @@ public:
 		void ApplyReleaseMindControl(TechnoClass* pOwner, TechnoClass* pTarget);
 		void ApplyPermanentMindControl(TechnoClass* pOwner, HouseClass* pHouse, TechnoClass* pTarget);
 		void ApplyAntiGravity(TechnoClass* pTarget, HouseClass* pHouse);
+		void ApplyBreakVxl(TechnoClass* pTarget, HouseClass* pHouse);
 
 	public:
 		void Detonate(TechnoClass* pOwner, HouseClass* pHouse, BulletExt::ExtData* pBullet, CoordStruct coords);

@@ -431,6 +431,8 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->AntiGravity_ConnectSW_DestoryHeight.Read(exINI, pSection, "AntiGravity.ConnectSW.DestoryHeight");
 	this->AntiGravity_ConnectSW_AlwaysFall.Read(exINI, pSection, "AntiGravity.ConnectSW.AlwaysFall");
 
+	this->BreakVxl.Read(exINI, pSection, "BreakVxl");
+
 	for (size_t i = 0; i < AttachAttachment_Types.size(); i++)
 	{
 		char key[0x20];
@@ -809,6 +811,8 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->AntiGravity_ConnectSW_Destory)
 		.Process(this->AntiGravity_ConnectSW_DestoryHeight)
 		.Process(this->AntiGravity_ConnectSW_AlwaysFall)
+
+		.Process(this->BreakVxl)
 
 		// Ares tags
 		.Process(this->Verses)

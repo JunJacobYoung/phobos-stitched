@@ -330,6 +330,7 @@ void WarheadTypeExt::ExtData::Detonate(TechnoClass* pOwner, HouseClass* pHouse, 
 		this->ReleaseMindControl ||
 		this->MindControl_Permanent ||
 		this->AntiGravity ||
+		this->BreakVxl ||
 		(//WeaponType
 			pWeaponExt != nullptr &&
 			(pWeaponExt->InvBlinkWeapon.Get() ||
@@ -500,6 +501,9 @@ void WarheadTypeExt::ExtData::DetonateOnOneUnit(HouseClass* pHouse, TechnoClass*
 
 	if (this->AntiGravity)
 		this->ApplyAntiGravity(pTarget, pHouse);
+
+	if (this->BreakVxl)
+		this->ApplyBreakVxl(pTarget, pHouse);
 
 	this->ApplyUnitDeathAnim(pHouse, pTarget);
 }
@@ -1972,4 +1976,19 @@ void WarheadTypeExt::ExtData::ApplyAntiGravity(TechnoClass* pTarget, HouseClass*
 
 	if (pTargetExt->CurrtenFallRate == 0 && pTarget->FallRate != 0)
 		pTargetExt->CurrtenFallRate = pTarget->FallRate;
+}
+
+void WarheadTypeExt::ExtData::ApplyBreakVxl(TechnoClass* pTarget, HouseClass* pHouse)
+{
+	if (pTarget && pTarget->WhatAmI() == AbstractType::Unit)
+	{
+		auto pType = pTarget->GetTechnoType();
+		if (pType && pType->Voxel)
+		{
+			auto pTargetExt = TechnoExt::ExtMap.Find(pTarget);
+
+			if (pTargetExt && pTargetExt->VoxelSizeRatio < 0)
+				pTargetExt->VoxelSizeRatio = 1.0;
+		}
+	}
 }

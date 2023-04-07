@@ -137,6 +137,8 @@ public:
 
 		Nullable<BuildingTypeClass*> ToggleBuildingType;
 
+		Nullable<BuildingTypeClass*> SoldAsBuilding;
+
 		//Ares
 		Valueable<bool> Factory_ExplicitOnly;
 
@@ -255,6 +257,8 @@ public:
 			, RallyRange { -1 }
 
 			, ToggleBuildingType {}
+
+			, SoldAsBuilding {}
 		{ }
 
 		// Ares 0.A functions

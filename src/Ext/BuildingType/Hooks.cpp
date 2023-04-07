@@ -419,3 +419,67 @@ DEFINE_HOOK(0x4ABB50, DisplayClass_LeftMouseButtonUp_BeforeNetworkPlace, 0x5)
 	return 0;
 }
 */
+
+DEFINE_HOOK(0x70644E, TechnoClass_Draw_Selling, 0x7)
+{
+	GET(TechnoClass*, pTechno, ESI);
+	GET(int, FrameIndex, ECX);
+
+	if (pTechno->CurrentMission == Mission::Selling)
+	{
+		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
+		{
+			auto pType = pBld ? pBld->Type : nullptr;
+			auto pTypeExt = pType ? BuildingTypeExt::ExtMap.Find(pType) : nullptr;
+
+			if (auto pSellBld = pTypeExt->SoldAsBuilding.Get())
+			{
+				SHPStruct* pSHP = pSellBld->Buildup;
+
+				R->EDX(pSHP);
+
+				int frameCount = pType->BuildingAnimFrame->FrameCount;
+				int frameCountSell = pSellBld->BuildingAnimFrame->FrameCount;
+
+				int frameIndexSell = FrameIndex * frameCountSell / frameCount;
+
+				R->ECX(frameIndexSell);
+			}
+		}
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(0x7064B4, TechnoClass_Draw_Selling_Shadow, 0x7)
+{
+	GET(TechnoClass*, pTechno, ESI);
+	GET_STACK(int, FrameIndex, STACK_OFFSET(0x84, 0x8));
+
+	if (pTechno->CurrentMission == Mission::Selling)
+	{
+		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
+		{
+			auto pType = pBld ? pBld->Type : nullptr;
+			auto pTypeExt = pType ? BuildingTypeExt::ExtMap.Find(pType) : nullptr;
+
+			if (auto pSellBld = pTypeExt->SoldAsBuilding.Get())
+			{
+				SHPStruct* pSHP = pSellBld->Buildup;
+
+				R->ECX(pSHP);
+
+				int frameCount = pType->BuildingAnimFrame->FrameCount;
+				int frameCountSell = pSellBld->BuildingAnimFrame->FrameCount;
+
+				int frameIndexSell = FrameIndex * frameCountSell / frameCount + (pSHP->Frames >> 1);
+
+				R->EAX(frameIndexSell);
+
+				return 0x7064CD;
+			}
+		}
+	}
+
+	return 0;
+}

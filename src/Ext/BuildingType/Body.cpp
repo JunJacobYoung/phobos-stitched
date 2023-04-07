@@ -278,6 +278,8 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->RallyRange.Read(exINI, pSection, "RallyRange");
 
 	this->ToggleBuildingType.Read(exINI, pSection, "ToggleBuildingType");
+
+	this->SoldAsBuilding.Read(exINI, pSection, "SoldAsBuilding");
 }
 
 void BuildingTypeExt::ExtData::CompleteInitialization()
@@ -406,6 +408,8 @@ void BuildingTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->RallyRange)
 
 		.Process(this->ToggleBuildingType)
+
+		.Process(this->SoldAsBuilding)
 		;
 }
 

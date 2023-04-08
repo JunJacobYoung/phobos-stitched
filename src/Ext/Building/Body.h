@@ -28,12 +28,17 @@ public:
 		BuildingClass* CurrentAirFactory = nullptr;
 		int AccumulatedGrindingRefund = 0;
 		int OfflineTimer = -1;
+		CDTimerClass SabotageTimer;
 		CDTimerClass SellTimer;
 		CDTimerClass CaptureTimer;
 		int CaptureCount = 0;
 		HouseClass* CaptureOwner = nullptr;
 		HouseClass* OriginalOwner = nullptr;
 		bool SellingForbidden = false;
+		ValueableVector<HouseClass*> RevealSightHouses;
+		ValueableVector<int> RevealSightRanges;
+		ValueableVector<CDTimerClass> RevealSightTimers;
+		ValueableVector<bool> RevealSightPermanents;
 
 		ExtData(BuildingClass* OwnerObject) : Extension<BuildingClass>(OwnerObject)
 			, TypeExtData { nullptr }
@@ -48,9 +53,11 @@ public:
 		void ApplyPoweredKillSpawns();
 		bool HasSuperWeapon(int index, bool withUpgrades) const;
 		void BuildingPowered();
+		void SabotageBuilding();
 		void SellBuilding();
 		void CaptureBuilding();
 		void ForbidSell();
+		void RevealSight();
 
 		virtual ~ExtData() = default;
 
@@ -100,5 +107,6 @@ public:
 	static bool DoGrindingExtras(BuildingClass* pBuilding, TechnoClass* pTechno, int refund);
 	static bool __fastcall HasSWType(BuildingClass* pBuilding, int swIdx);
 	static bool HandleInfiltrate(BuildingClass* pBuilding, HouseClass* pInfiltratorHouse);
+	static bool HandleInfiltrateUpgrades(BuildingClass* pBuilding, HouseClass* pInfiltratorHouse, BuildingTypeExt::ExtData* pTypeExt);
 	static void StoreTiberium(BuildingClass* pThis, float amount, int idxTiberiumType, int idxStorageTiberiumType);
 };

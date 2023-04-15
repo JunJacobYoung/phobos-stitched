@@ -4,6 +4,7 @@
 #include <PreviewClass.h>
 #include <Surface.h>
 
+#include <Ext/Scenario/Body.h>
 #include <Ext/House/Body.h>
 #include <Ext/Side/Body.h>
 #include <Ext/Rules/Body.h>
@@ -354,4 +355,26 @@ DEFINE_HOOK(0x4F4583, GScreenClass_DrawText_FPS, 0x6)
 	DSurface::Composite->DrawTextA(text2, &DSurface::ViewBounds, &pos2, colorText, 0, TextPrintType::NoShadow);
 
 	return 0;
+}
+
+// disable save button on the ingame menu
+// Powered by Ares 0.A source code
+// Author : Alexb
+DEFINE_HOOK(0x4F17F6, sub_4F1720_DisableSaves, 0x6)
+{
+	GET(HWND, hDlg, EBP);
+
+	if (HWND hItem = GetDlgItem(hDlg, 1311))
+	{
+		if (!ScenarioExt::Global()->CanSaveGame)
+		{
+			EnableWindow(hItem, FALSE);
+		}
+		else
+		{
+			EnableWindow(hItem, TRUE);
+		}
+	}
+
+	return 0x4F1834;
 }

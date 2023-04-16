@@ -47,6 +47,8 @@ public:
 
 	static bool ToSelectSW;
 
+	static CDTimerClass TimerUltimateControl;
+
 #ifdef DEBUG
 	static bool DetachFromDebugger();
 #endif

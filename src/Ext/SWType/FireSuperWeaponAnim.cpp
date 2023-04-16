@@ -100,4 +100,10 @@ void SWTypeExt::ExtData::FireSuperWeaponAnim(SuperClass* pSW, HouseClass* pHouse
 
 	}
 
+	int FramesToControl = this->UltimateControl_Frames.Get();
+	if (FramesToControl > 0)
+	{
+		Phobos::TimerUltimateControl.Start(FramesToControl);
+	}
+
 }

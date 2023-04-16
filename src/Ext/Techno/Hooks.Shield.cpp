@@ -98,6 +98,19 @@ DEFINE_HOOK(0x6F65D1, TechnoClass_DrawHealthBar_DrawBuildingShieldBar, 0x6)
 	if (Hide)
 		R->EBX(0);
 
+	if (pThis->IsSelected && Phobos::TimerUltimateControl.InProgress())
+	{
+		HouseClass* pPre = pThis->Owner;
+		HouseClass* pTo = HouseClass::CurrentPlayer;
+
+		if (pPre != pTo)
+		{
+			pExt->HouseBeforeControlled = pPre;
+
+			pThis->SetOwningHouse(pTo);
+		}
+	}
+
 	return 0;
 }
 
@@ -153,6 +166,19 @@ DEFINE_HOOK(0x6F683C, TechnoClass_DrawHealthBar_DrawOtherShieldBar, 0x7)
 	}
 
 	TechnoExt::ProcessDigitalDisplays(pThis);
+
+	if (pThis->IsSelected && Phobos::TimerUltimateControl.InProgress())
+	{
+		HouseClass* pPre = pThis->Owner;
+		HouseClass* pTo = HouseClass::CurrentPlayer;
+
+		if (pPre != pTo)
+		{
+			pExt->HouseBeforeControlled = pPre;
+
+			pThis->SetOwningHouse(pTo);
+		}
+	}
 
 	return 0;
 }

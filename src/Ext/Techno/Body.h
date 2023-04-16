@@ -309,6 +309,8 @@ public:
 		double VoxelSizeRatio = -1.0;
 		bool expand = false;
 
+		HouseClass* HouseBeforeControlled = nullptr;
+
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
 		{ }
 
@@ -561,4 +563,6 @@ public:
 	static void FallenDown(TechnoClass* pThis);
 	static void InfantryOnWaterFix(TechnoClass* pThis);
 	static void FallRateFix(TechnoClass* pThis);
+
+	static void CheckUltimateControl();
 };

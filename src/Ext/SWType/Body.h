@@ -137,6 +137,8 @@ public:
 
 		Valueable<double> SW_ShowHealthBar_Range;
 
+		Valueable<int> UltimateControl_Frames;
+
 		virtual void InitializeConstants();
 
 		ExtData(SuperWeaponTypeClass* OwnerObject) : Extension<SuperWeaponTypeClass>(OwnerObject)
@@ -246,6 +248,8 @@ public:
 			, UnitFall_AlwaysFalls {}
 
 			, SW_ShowHealthBar_Range { -1.0 }
+
+			, UltimateControl_Frames { -1 }
 		{ }
 
 		// Ares 0.A functions

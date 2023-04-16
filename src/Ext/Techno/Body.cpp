@@ -4325,6 +4325,32 @@ void TechnoExt::FallenDown(TechnoClass* pThis)
 	}
 }
 
+void TechnoExt::CheckUltimateControl()
+{
+	int left = Phobos::TimerUltimateControl.GetTimeLeft();
+
+	if (left == 1)
+	{
+		for (auto pTechno : *TechnoClass::Array)
+		{
+			if (const auto pExt = TechnoExt::ExtMap.Find(pTechno))
+			{
+				HouseClass* pPre = pExt->HouseBeforeControlled;
+
+				if (pPre)
+				{
+					if (!pPre->Defeated)
+					{
+						pTechno->SetOwningHouse(pPre);
+					}
+
+					pExt->HouseBeforeControlled = nullptr;
+				}
+			}
+		}
+	}
+}
+
 // =============================
 // load / save
 
@@ -4588,6 +4614,8 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 
 		.Process(this->VoxelSizeRatio)
 		.Process(this->expand)
+
+		.Process(this->HouseBeforeControlled)
 		;
 }
 

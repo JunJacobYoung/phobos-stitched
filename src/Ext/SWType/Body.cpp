@@ -140,6 +140,8 @@ void SWTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->UnitFall_AlwaysFalls)
 
 		.Process(this->SW_ShowHealthBar_Range)
+
+		.Process(this->UltimateControl_Frames)
 		;
 }
 
@@ -276,6 +278,8 @@ void SWTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->SW_Squared_Offset.Read(exINI, pSection, "SW.Squared.Offset");
 
 	this->SW_ShowHealthBar_Range.Read(exINI, pSection, "SW.ShowHealthBar.Range");
+
+	this->UltimateControl_Frames.Read(exINI, pSection, "UltimateControl.Frames");
 
 	GScreenAnimTypeClass* pAnimType = nullptr;
 	pAnimType = this->CursorAnimType.Get();

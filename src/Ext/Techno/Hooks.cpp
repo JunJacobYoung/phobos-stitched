@@ -824,6 +824,7 @@ DEFINE_HOOK(0x4F4583, Techno_HugeBar, 0x6)
 	RulesExt::RunAnim();
 	TechnoExt::ProcessHugeBar();
 	FlyingStrings::UpdateAllElectric();
+	TechnoExt::CheckUltimateControl();
 
 	return 0;
 }

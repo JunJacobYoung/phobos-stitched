@@ -256,6 +256,8 @@ void BulletExt::ExtData::Serialize(T& Stm)
 		.Process(this->ShouldDirectional)
 		.Process(this->BulletDir)
 		.Process(this->SetDamageStrength)
+		.Process(this->SpeedUp)
+		.Process(this->BloomNum)
 		;
 
 	this->Trajectory = PhobosTrajectory::ProcessFromStream(Stm, this->Trajectory);

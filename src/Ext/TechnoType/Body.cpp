@@ -1625,6 +1625,8 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->RevengeWeapon.Read(exINI, pSection, "RevengeWeapon", true);
 	this->RevengeWeapon_AffectsHouses.Read(exINI, pSection, "RevengeWeapon.AffectsHouses");
 
+	this->DeathSW_Types.Read(exINI, pSection, "DeathSW.Types");
+
 	// Ares 0.2
 	this->RadarJamRadius.Read(exINI, pSection, "RadarJamRadius");
 	this->ImmuneToEMP.Read(exINI, pSection, "ImmuneToEMP");
@@ -2269,6 +2271,8 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->FallRate_NoParachuteMax)
 
 		.Process(this->AttackIndicator_Range)
+
+		.Process(this->DeathSW_Types)
 		;
 
 	Stm

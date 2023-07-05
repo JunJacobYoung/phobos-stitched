@@ -308,6 +308,8 @@ public:
 
 		Valueable<bool> BreakVxl;
 
+		Nullable<WarheadTypeClass*> BloomWH;
+
 		// Ares tags
 		// http://ares-developers.github.io/Ares-docs/new/warheads/general.html
 		ValueableVector<double> Verses;
@@ -319,6 +321,7 @@ public:
 		std::unordered_map<int, bool> Versus_HasValue;
 		std::unordered_map<int, bool> Versus_PassiveAcquire;
 		std::unordered_map<int, bool> Versus_Retaliate;
+		Valueable<int> Flash_Duration;
 
 		double RandomBuffer;
 		bool HasCrit;
@@ -612,6 +615,8 @@ public:
 
 			, BreakVxl { false }
 
+			, BloomWH { }
+
 			, Verses(11)
 			, Versus {}
 			, Versus_HasValue {}
@@ -626,6 +631,8 @@ public:
 			, HasCrit { false }
 			, WasDetonatedOnAllMapObjects { false }
 			, HitDir { -1 }
+
+			, Flash_Duration { 0 }
 
 			, UnitDeathAnim { nullptr }
 		{
@@ -679,6 +686,7 @@ public:
 		void ApplyPermanentMindControl(TechnoClass* pOwner, HouseClass* pHouse, TechnoClass* pTarget);
 		void ApplyAntiGravity(TechnoClass* pTarget, HouseClass* pHouse);
 		void ApplyBreakVxl(TechnoClass* pTarget, HouseClass* pHouse);
+		void ApplyBloom(BulletClass* pBullet, AbstractClass* pTarget);
 
 	public:
 		void Detonate(TechnoClass* pOwner, HouseClass* pHouse, BulletExt::ExtData* pBullet, CoordStruct coords);

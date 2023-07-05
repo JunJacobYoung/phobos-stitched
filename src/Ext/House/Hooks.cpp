@@ -138,6 +138,7 @@ DEFINE_HOOK(0x4F8440, HouseClass_AI_ScoreCheck, 0x5)
 	HouseExt::UnitFallActivate(pThis);
 	HouseExt::GapRadar(pThis);
 	HouseExt::RevealRadarSight(pThis);
+	HouseExt::CallbackSW(pThis);
 
 	PhobosGlobal::Global()->CheckFallUnitQueued();
 	PhobosGlobal::Global()->CheckSuperQueued();
@@ -230,3 +231,55 @@ DEFINE_HOOK(0x440B4F, BuildingClass_Unlimbo_SetShouldRebuild, 0x5)
 
 	return ContinueCheck;
 }
+
+
+
+
+// 只要光标处于DSurface::ViewBounds，基本每帧都触发，除非触发了B
+DEFINE_HOOK(0x69300B, MouseClass_UpdateCursor_A, 0x6)
+{
+	//Debug::LogAndMessage("1\n");
+
+	const auto pHouse = HouseClass::CurrentPlayer();
+	const auto pHouseExt = HouseExt::ExtMap.Find(pHouse);
+
+	if (pHouseExt->RecordTimer.HasTimeLeft())
+	{
+		R->EAX(Action::None); // 修改了光标外观，但是依然可以移动单位、释放超武、摆放建筑
+		return 0x69301A;
+	}
+	return 0;
+}
+
+// 按下左键时触发一次，且在左键持续按下过程中不再触发A、B、C，单位移动
+DEFINE_HOOK(0x6931A5, MouseClass_UpdateCursor_B, 0x6)
+{
+	//Debug::LogAndMessage("22\n");
+
+	const auto pHouse = HouseClass::CurrentPlayer();
+	const auto pHouseExt = HouseExt::ExtMap.Find(pHouse);
+
+	if (pHouseExt->RecordTimer.HasTimeLeft())
+	{
+		R->EAX(Action::None); // 禁止移动单位、释放超武，超武范围同心圆还在，可以摆放建筑
+		return 0x6931B4;
+	}
+	return 0;
+}
+
+// 松开左键时触发一次，随后立即继续每帧触发A
+DEFINE_HOOK(0x693268, MouseClass_UpdateCursor_C, 0x5)
+{
+	//Debug::LogAndMessage("333\n");
+
+	const auto pHouse = HouseClass::CurrentPlayer();
+	const auto pHouseExt = HouseExt::ExtMap.Find(pHouse);
+
+	if (pHouseExt->RecordTimer.HasTimeLeft())
+	{
+		R->EAX(Action::None);
+		return 0x693276;
+	}
+	return 0;
+}
+

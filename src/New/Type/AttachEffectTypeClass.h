@@ -75,6 +75,8 @@ public:
 	Nullable<WeaponTypeClass*> RevengeWeaponAttach;
 	Valueable<AffectedHouse> RevengeWeaponAttach_AffectsHouses;
 	Valueable<bool> ForbiddenSelfHeal;
+	Valueable<bool> DrawSoul;
+	Valueable<bool> LockTurret;
 
 	int ArrayIndex;
 
@@ -146,6 +148,8 @@ public:
 		, RevengeWeaponAttach {}
 		, RevengeWeaponAttach_AffectsHouses { AffectedHouse::All }
 		, ForbiddenSelfHeal(false)
+		, DrawSoul(false)
+		, LockTurret(false)
 	{ }
 
 	virtual ~AttachEffectTypeClass() = default;

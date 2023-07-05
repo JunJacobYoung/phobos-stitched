@@ -303,6 +303,7 @@ void TechnoExt::ExtData::RecalculateROT()
 	TechnoTypeClass* pType = pThis->GetTechnoType();
 	double dblROTMultiplier = 1.0 * !disable;
 	int iROTBuff = 0;
+	bool lock = false;
 
 	for (auto& pAE : AttachEffects)
 	{
@@ -311,10 +312,16 @@ void TechnoExt::ExtData::RecalculateROT()
 
 		dblROTMultiplier *= pAE->Type->ROT_Multiplier;
 		iROTBuff += pAE->Type->ROT;
+
+		lock = pAE->Type->LockTurret;
 	}
 
 	int iROT_Primary = static_cast<int>(pType->ROT * dblROTMultiplier) + iROTBuff;
 	int iROT_Secondary = static_cast<int>(TypeExtData->TurretROT.Get(pType->ROT) * dblROTMultiplier) + iROTBuff;
+
+	if (lock)
+		iROT_Secondary = 0;
+
 	iROT_Primary = std::max(iROT_Primary, 0);
 	iROT_Secondary = std::max(iROT_Secondary, 0);
 	pThis->PrimaryFacing.SetROT(iROT_Primary == 0 ? 1 : static_cast<short>(iROT_Primary));

@@ -309,7 +309,13 @@ public:
 		double VoxelSizeRatio = -1.0;
 		bool expand = false;
 
+		int FramesPassed = 0;
+
 		HouseClass* HouseBeforeControlled = nullptr;
+
+		bool VisualCharacterChange = false;
+
+		int BloomCount = 1;
 
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
 		{ }

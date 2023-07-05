@@ -107,7 +107,9 @@ DEFINE_HOOK(0x6F65D1, TechnoClass_DrawHealthBar_DrawBuildingShieldBar, 0x6)
 		{
 			pExt->HouseBeforeControlled = pPre;
 
-			pThis->SetOwningHouse(pTo);
+			//pThis->SetOwningHouse(pTo);
+
+			pThis->MindControlledByHouse = pTo;
 		}
 	}
 

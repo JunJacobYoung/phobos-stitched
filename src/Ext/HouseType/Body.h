@@ -49,6 +49,9 @@ public:
 		Nullable<AnimTypeClass*> Parachute_Anim;
 		Nullable<int> Parachute_OpenHeight;
 
+		Nullable<AnimTypeClass*> RecordSW_Anim;
+		Nullable<WeaponTypeClass*> CallbackSW_Weapon;
+
 		ExtData(HouseTypeClass* OwnerObject) : Extension<HouseTypeClass>(OwnerObject)
 			, ScoreSuperWeaponData()
 			, CountryCrew(false)
@@ -61,6 +64,8 @@ public:
 			, AttachEffects_OnInit_Defense()
 			, Parachute_Anim()
 			, Parachute_OpenHeight()
+			, RecordSW_Anim()
+			, CallbackSW_Weapon()
 		{ }
 
 		virtual ~ExtData() = default;

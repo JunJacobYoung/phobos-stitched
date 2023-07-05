@@ -16,6 +16,7 @@
 #include <New/Type/TemperatureTypeClass.h>
 
 #include <WWMouseClass.h>
+#include <EventClass.h>
 
 inline void Subset_1(TechnoClass* pThis, TechnoTypeClass* pType, TechnoExt::ExtData* pExt, TechnoTypeExt::ExtData* pTypeExt)
 {
@@ -256,27 +257,75 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 		TechnoExt::SelectSW(pThis, pTypeExt);
 	}
 
-	double ratio = pExt->VoxelSizeRatio;
-	if (ratio > 0)
+	//double ratio = pExt->VoxelSizeRatio;
+	//if (ratio > 0)
+	//{
+	//	if (ratio < 0.6)
+	//		pExt->expand = true;
+
+	//	bool expand = pExt->expand;
+
+	//	if (expand)
+	//	{
+	//		if (ratio > 4.0)
+	//		{
+	//			int damage = pThis->Health + 1;
+	//			pThis->ReceiveDamage(&damage, 0, RulesClass::Instance->C4Warhead, nullptr, true, true, pThis->Owner);
+	//		}
+	//		else
+	//			pExt->VoxelSizeRatio += 0.04;
+	//	}
+	//	else
+	//		pExt->VoxelSizeRatio -= 0.01;
+	//}
+
+	//double ratio = pExt->VoxelSizeRatio;
+	//if (ratio > 0)
+	//{
+	//	if (ratio >= 1.0)
+	//		pExt->VoxelSizeRatio = -1.0;
+	//	else
+	//	{
+	//		if (pExt->FramesPassed++ > 100)
+	//			pExt->VoxelSizeRatio += 0.008;
+	//		else
+	//			pExt->VoxelSizeRatio = 0.5;
+	//	}
+	//}
+
+
+	if (pType->Strength == 8100)
 	{
-		if (ratio < 0.6)
-			pExt->expand = true;
+		double ratio = pExt->VoxelSizeRatio;
 
-		bool expand = pExt->expand;
+		int mission = (int)pThis->CurrentMission;
+		int status = pThis->MissionStatus;
 
-		if (expand)
+		if (mission == 1 && status == 1)
 		{
-			if (ratio > 4.0)
-			{
-				int damage = pThis->Health + 1;
-				pThis->ReceiveDamage(&damage, 0, RulesClass::Instance->C4Warhead, nullptr, true, true, pThis->Owner);
-			}
-			else
-				pExt->VoxelSizeRatio += 0.04;
+			pExt->VoxelSizeRatio = 0.3;
 		}
-		else
-			pExt->VoxelSizeRatio -= 0.01;
+
+		if (ratio > 0)
+		{
+			if (mission == 1 && status == 3)
+			{
+				if (ratio < 1.0)
+				{
+					pExt->VoxelSizeRatio += 0.02;
+					if (pExt->VoxelSizeRatio > 1.0)
+						pExt->VoxelSizeRatio = 1.0;
+				}
+			}
+			else if (mission == 2 && status == 3)
+			{
+				pExt->VoxelSizeRatio -= 0.012;
+			}
+		}
 	}
+
+	if (pThis->GetCurrentMission() == Mission::Guard)
+		pExt->BloomCount = 1;
 
 	return 0;
 }
@@ -1647,6 +1696,160 @@ DEFINE_HOOK(0x73E411, UnitClass_Mission_Unload_DumpAmount, 0x7)
 
 	return 0x73E42B;
 }
+/*
+DEFINE_HOOK(0x6D4735, TacticalClass_Render_SelectedOrNot, 0x6)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	auto pType = pThis->GetTechnoType();
+
+	if (pType->Strength == 8100)
+	{
+		auto getMissionStatusName = [](int mID)
+		{
+			switch (mID)
+			{
+			case -1:
+				return "None";
+			case 0:
+				return "ValidateAZ";
+			case 1:
+				return "PickAttackLocation";
+			case 2:
+				return "TakeOff";
+			case 3:
+				return "FlyToPosition";
+			case 4:
+				return "FireAtTarget";
+			case 5:
+				return "FireAtTarget2";
+			case 6:
+				return "FireAtTarget2_Strafe";
+			case 7:
+				return "FireAtTarget3_Strafe";
+			case 8:
+				return "FireAtTarget4_Strafe";
+			case 9:
+				return "FireAtTarget5_Strafe";
+			case 10:
+				return "ReturnToBase";
+			default:
+				return "INVALIDMISSION";
+			}
+		};
+		wchar_t textStatus[0x30];
+		swprintf_s(textStatus, L"Current Status = %d (%hs)", pThis->MissionStatus, getMissionStatusName((int)pThis->MissionStatus));
+		COLORREF color = Drawing::RGB_To_Int({ 0, 255, 0 });
+		RectangleStruct rect = { 0, 0, 0, 0 };
+		DSurface::Temp->GetRect(&rect);
+		TextPrintType ePrintType = TextPrintType::Center | TextPrintType::FullShadow | TextPrintType::LASTPOINT;
+
+		auto coord = pThis->GetCoords();
+		auto pLocation = TacticalClass::Instance->CoordsToClient(coord);
+
+		Point2D posDraw = { pLocation.X, pLocation.Y - 40 };
+
+		DSurface::Temp->DrawTextA(textStatus, &rect, &posDraw, color, 0, ePrintType);
+
+
+		auto getMissionName = [](int mID)
+		{
+			switch (mID)
+			{
+			case -1:
+				return "None";
+			case 0:
+				return "Sleep";
+			case 1:
+				return "Attack";
+			case 2:
+				return "Move";
+			case 3:
+				return "QMove";
+			case 4:
+				return "Retreat";
+			case 5:
+				return "Guard";
+			case 6:
+				return "Sticky";
+			case 7:
+				return "Enter";
+			case 8:
+				return "Capture";
+			case 9:
+				return "Eaten";
+			case 10:
+				return "Harvest";
+			case 11:
+				return "AreaGuard";
+			case 12:
+				return "Return";
+			case 13:
+				return "Stop";
+			case 14:
+				return "Ambush";
+			case 15:
+				return "Hunt";
+			case 16:
+				return "Unload";
+			case 17:
+				return "Sabotage";
+			case 18:
+				return "Construction";
+			case 19:
+				return "Selling";
+			case 20:
+				return "Repair";
+			case 21:
+				return "Rescue";
+			case 22:
+				return "Missile";
+			case 23:
+				return "Harmless";
+			case 24:
+				return "Open";
+			case 25:
+				return "Patrol";
+			case 26:
+				return "ParadropApproach";
+			case 27:
+				return "ParadropOverfly";
+			case 28:
+				return "Wait";
+			case 29:
+				return "AttackMove";
+			case 30:
+				return "SpyplaneApproach";
+			case 31:
+				return "SpyplaneOverfly";
+			default:
+				return "INVALIDMISSION";
+			}
+		};
+		wchar_t text[0x30];
+		swprintf_s(text, L"Current Mission = %d (%hs)", pThis->CurrentMission, getMissionName((int)pThis->CurrentMission));
+
+		posDraw = { pLocation.X, pLocation.Y - 60 };
+
+		DSurface::Temp->DrawTextA(text, &rect, &posDraw, color, 0, ePrintType);
+
+		auto pExt = TechnoExt::ExtMap.Find(pThis);
+		wchar_t ratio[0x30];
+		swprintf_s(ratio, L"Voxel Ratio = %.2f", pExt->VoxelSizeRatio);
+
+		posDraw = { pLocation.X, pLocation.Y - 80 };
+
+		DSurface::Temp->DrawTextA(ratio, &rect, &posDraw, color, 0, ePrintType);
+
+		//if (pThis->MissionStatus == (int)AirAttackStatus::ReturnToBase)
+		//	Debug::LogAndMessage("ReturnToBase\n");
+
+		//if (pThis->MissionStatus == (int)AirAttackStatus::TakeOff)
+		//	Debug::LogAndMessage("TakeOff\n");
+
+	}
+	return 0;
+}*/
 
 DEFINE_HOOK(0x6D4748, TacticalClass_Render_Selected, 0x6)
 {
@@ -1688,6 +1891,26 @@ DEFINE_HOOK(0x6D4748, TacticalClass_Render_Selected, 0x6)
 		}
 	}
 
+	if (pThis->IsInAir())
+	{
+		CoordStruct coordAir = pThis->GetCoords();
+		CoordStruct coordLand = coordAir - CoordStruct { 0, 0, pThis->GetHeight() };
+		//或者使用CoordStruct coordLand = { coordAir.X, coordAir.Y, MapClass::Instance->GetCellFloorHeight(coords) };
+
+		DrawALine(coordAir.X, coordAir.Y, coordAir.Z, coordLand.X, coordLand.Y, coordLand.Z, 43008, false, false); // green
+
+		Point2D posLand = TacticalClass::Instance->CoordsToClient(coordLand);
+
+		double range = 0.5;
+		DSurface::Composite->DrawEllipse(posLand.X, posLand.Y, range, COLOR_GREEN);
+
+		double ratio = Unsorted::CurrentFrame % 60 / 60.0;
+		DSurface::Composite->DrawEllipse(posLand.X, posLand.Y, range * ratio, COLOR_GREEN);
+
+		double ratio2 = (Unsorted::CurrentFrame + 30) % 60 / 60.0;
+		DSurface::Composite->DrawEllipse(posLand.X, posLand.Y, range * ratio2, COLOR_GREEN);
+	}
+
 	return 0;
 }
 
@@ -1706,7 +1929,7 @@ DEFINE_HOOK(0x73B5CE, UnitClass_DrawAsVXL_DrawMatrix, 0x8) // Body
 		if (ratio > 0)
 		{
 			Matrix3D pMat2 = Matrix3D(*pMat);
-			pMat2.Scale(ratio);
+			pMat2.Scale((float)ratio);
 			R->EAX(&pMat2);
 			pMat = &pMat2;
 			pThis->UpdatePlacement(PlacementType::Redraw);
@@ -1715,3 +1938,255 @@ DEFINE_HOOK(0x73B5CE, UnitClass_DrawAsVXL_DrawMatrix, 0x8) // Body
 
 	return 0;
 }
+
+// aircraft
+DEFINE_HOOK_AGAIN(0x414826, AircraftClass_DrawAsVXL_DrawMatrix, 0x5) // Shadow
+DEFINE_HOOK(0x41496C, AircraftClass_DrawAsVXL_DrawMatrix, 0x5) // Body
+{
+	GET(AircraftClass*, pThis, EBP);
+	GET(Matrix3D*, pMat, EAX);
+
+	const auto pExt = pThis ? TechnoExt::ExtMap.Find(pThis) : nullptr;
+
+	if (pExt)
+	{
+		double ratio = pExt->VoxelSizeRatio;
+		if (ratio > 0)
+		{
+			Matrix3D pMat2 = Matrix3D(*pMat);
+			pMat2.Scale((float)ratio);
+			R->EAX(&pMat2);
+			pMat = &pMat2;
+			pThis->UpdatePlacement(PlacementType::Redraw);
+		}
+	}
+
+	return 0;
+}
+
+
+
+DEFINE_HOOK(0x4C2400, TacticalClass_DrawEBolt, 0x7)
+{
+	LEA_STACK(CoordStruct*, pCoordSrc, STACK_OFFSET(0x408, -0x360));
+	LEA_STACK(CoordStruct*, pCoordDest, STACK_OFFSET(0x408, -0x388));
+
+	//GET_STACK(EBolt*, pEBolt, STACK_OFFSET(0x408, -0x3C8));
+	//auto pTechno = pEBolt->Owner;
+
+	ColorStruct Color = { 0, 0, 255 };
+	int Duration = 3;
+	int Thickness = 10;
+
+	LaserDrawClass* pLaser = GameCreate<LaserDrawClass>(
+		*pCoordSrc, *pCoordDest,
+		Color, Color, Color,
+		Duration);
+	pLaser->IsHouseColor = true;
+	pLaser->Thickness = Thickness;
+
+	return 0x4C2710;
+}
+
+/*
+DEFINE_HOOK(0x6AB1D9, SelectClass_Click, 0x6)
+{
+	GET_STACK(bool, IsShiftDown, STACK_OFFSET(0xAC, 0xC));
+
+	if (IsShiftDown)
+		Debug::LogAndMessage("Shift\n");
+	else
+		Debug::LogAndMessage("Null\n");
+
+	return 0;
+}
+*/
+
+
+DEFINE_HOOK(0x6AB755, SelectClass_Click, 0x7)
+{
+	GET_STACK(bool, IsShiftDown, STACK_OFFSET(0xAC, 0xC));
+
+	if (IsShiftDown)
+	{
+		GET(TechnoTypeClass*, pItem, EDI);
+		GET(bool, IsNaval, ECX);
+
+		for (int i = 0; i < 10; i++)
+		{
+			EventClass eEvent(HouseClass::CurrentPlayer->ArrayIndex, EventType::PRODUCE, static_cast<int>(pItem->WhatAmI()), pItem->GetArrayIndex(), IsNaval);
+			EventClass::AddEvent(eEvent);
+		}
+		
+		return 0x6AB7CC;
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(0x702672, TechnoClass_ReceiveDamage_OnDestroy, 0x5)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	auto pTypeExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
+
+	CellStruct cellTarget = pThis->GetMapCoords();
+
+	for (const auto swIdx : pTypeExt->DeathSW_Types)
+	{
+		if (const auto pSuper = pThis->Owner->Supers.GetItem(swIdx))
+		{
+			pSuper->SetReadiness(true);
+			pSuper->Launch(cellTarget, pThis->Owner->IsCurrentPlayer());
+			pSuper->Reset();
+		}
+	}
+
+	return 0;
+}
+
+
+//DEFINE_HOOK(0x5F5480, ObjectClass_ReceiveDamage_Flash, 0x6)
+//{
+//	GET(ObjectClass*, pThis, ESI);
+//	GET_STACK(WarheadTypeClass*, pWH, STACK_OFFSET(0x24, 0xC));
+//
+//	const auto pWHExt = WarheadTypeExt::ExtMap.Find(pWH);
+//
+//	int frames = pWHExt->Flash_Duration == -1 ? 0 : 7;
+//	pThis->Flash(frames);
+//
+//	return 0x5F548C;
+//}
+
+
+/*
+DEFINE_HOOK(0x706656, TechnoClass_DrawVoxel_VisualCharacter, 0x5)
+{
+	GET(TechnoClass*, pThis, EBP);
+
+	const auto pExt = TechnoExt::ExtMap.Find(pThis);
+
+	Debug::LogAndMessage("VisualCharacterChange\n");
+
+	if (pExt->VisualCharacterChange)
+	{
+		R->EAX(VisualType::Hidden);
+		return 0x70665E;
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(0x4DAFA6, FootClass_Draw_A_VXL_Copy, 0x5)
+{
+	GET(TechnoClass*, pThis, EBX);
+
+	const auto pExt = TechnoExt::ExtMap.Find(pThis);
+
+	if (pExt)
+	{
+		for (const auto& pAE : pExt->AttachEffects)
+		{
+			if (pAE->IsActive() && pAE->Type->DrawSoul)
+			{
+				GET(VoxelStruct*, Voxel, EDX);
+				GET(DWORD, dwUnk2, ECX);
+				GET(short, Facing, EAX);
+				GET_STACK(int, VoxelIndex, 0x0);
+				GET_STACK(RectangleStruct*, Rect, 0x4);
+				GET_STACK(Point2D*, Location, STACK_OFFSET(0x68, 0x18));
+				GET_STACK(Matrix3D*, Matrix, 0xC);
+				GET_STACK(int, Intensity, 0x10);
+				GET_STACK(DWORD, dwUnk9, 0x14);
+				GET_STACK(DWORD, dwUnk10, 0x18);
+
+				Point2D posUp = *Location;
+				posUp.Y -= 50;
+
+				pExt->VisualCharacterChange = true;
+
+				pThis->DrawVoxel(
+					*Voxel,
+					dwUnk2,
+					Facing,
+					reinterpret_cast<IndexClass<VoxelIndexKey, VoxelCacheStruct*>&>(VoxelIndex),
+					*Rect,
+					posUp,
+					*Matrix,
+					Intensity,
+					dwUnk9,
+					dwUnk10
+				);
+
+				pExt->VisualCharacterChange = false;
+			}
+		}
+	}
+
+	return 0;
+}
+*/
+
+
+
+DEFINE_HOOK(0x70644F, DrawSHP_Copy, 0x7)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	const auto pExt = TechnoExt::ExtMap.Find(pThis);
+
+	if (pExt)
+	{
+		for (const auto& pAE : pExt->AttachEffects)
+		{
+			if (pAE->IsActive() && pAE->Type->DrawSoul)
+			{
+				GET(ConvertClass*, Palette, EBX);
+				GET(SHPStruct*, SHP, EDX);
+				GET_STACK(int, FrameIndex, 0x0);
+				GET_STACK(Point2D*, Position, 0x4);
+				GET_STACK(RectangleStruct*, Bounds, 0x8);
+				GET_STACK(BlitterFlags, Flags, 0xC);
+				GET_STACK(int, Remap, 0x10);
+				GET_STACK(int, ZAdjust, 0x14);
+				GET_STACK(ZGradient, ZGradientDescIndex, 0x18);
+				GET_STACK(int, Brightness, 0x1C);
+				GET_STACK(int, TintColor, 0x20);
+				GET_STACK(SHPStruct*, ZShape, 0x24);
+				GET_STACK(int, ZShapeFrame, 0x28);
+				GET_STACK(int, XOffset, 0x2C);
+				GET_STACK(int, YOffset, 0x30);
+
+				Point2D posUp = *Position;
+				posUp.Y -= 30;
+
+				BlitterFlags FlagTrans = Flags;
+				FlagTrans |= BlitterFlags::TransLucent50;
+
+				CC_Draw_Shape(
+					DSurface::Temp,
+					Palette,
+					SHP,
+					FrameIndex,
+					&posUp,
+					Bounds,
+					FlagTrans,
+					Remap,
+					ZAdjust, // + 1 = sqrt(3.0) pixels away from screen
+					ZGradientDescIndex,
+					Brightness, // 0~2000. Final color = saturate(OriginalColor * Brightness / 1000.0f)
+					TintColor,
+					ZShape,
+					ZShapeFrame,
+					XOffset,
+					YOffset
+				);
+			}
+		}
+	}
+
+	return 0;
+}
+
+

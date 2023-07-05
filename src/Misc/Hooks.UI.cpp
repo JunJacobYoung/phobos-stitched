@@ -14,6 +14,10 @@
 #include <New/Entity/BannerClass.h>
 #include <Utilities/Debug.h>
 #include <FPSCounter.h>
+#include <WWMouseClass.h>
+#include <Ext/HouseType/Body.h>
+#include <Misc/GScreenCreate.h>
+#include <Ext/Anim/Body.h>
 
 DEFINE_HOOK(0x777C41, UI_ApplyAppIcon, 0x9)
 {
@@ -303,6 +307,34 @@ DEFINE_HOOK(0x456776, BuildingClass_DrawRadialIndicator_Visibility, 0x6)
 
 DEFINE_HOOK(0x6DA215, TacticalClass_Render_DrawDraggingRect, 0x9)
 {
+	const auto pHouse = HouseClass::CurrentPlayer();
+	const auto pHouseExt = HouseExt::ExtMap.Find(pHouse);
+
+	if (pHouseExt->RecordTimer.HasTimeLeft())
+	{
+		//Debug::LogAndMessage("6\n");
+
+		int TimeLeft = pHouseExt->RecordTimer.GetTimeLeft();
+		pHouseExt->RecordSW_FrameIdx.push_back(TimeLeft);
+
+		//int frame = Unsorted::CurrentFrame;
+		//Debug::LogAndMessage("[%d]push back %d\n", frame, TimeLeft);
+
+		Point2D posCursor = { WWMouseClass::Instance->GetX(),  WWMouseClass::Instance->GetY() };
+		pHouseExt->RecordSW_Pos.push_back(posCursor);
+
+		if (const auto pAnimType = HouseTypeExt::ExtMap.Find(pHouse->Type)->RecordSW_Anim.Get())
+		{
+			CoordStruct coord = GScreenCreate::ScreenToCoords(posCursor);
+			if (auto pAnim = GameCreate<AnimClass>(pAnimType, coord, 0, 1, 0x2600u, 0, 0))
+			{
+				pAnim->Owner = pHouse;
+			}
+		}
+
+		return 0x6DA221;
+	}
+
 	GET(RectangleStruct*, pRect, EAX);
 
 	ColorStruct color = { 50, 100, 150 };

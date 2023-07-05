@@ -254,6 +254,9 @@ DEFINE_HOOK(0x444119, BuildingClass_KickOutUnit_UnitType_Phobos, 0x6)
 	GET(UnitClass*, pUnit, EDI);
 	GET(BuildingClass*, pFactory, ESI);
 
+	auto pExt = TechnoExt::ExtMap.Find(pUnit);
+	pExt->VoxelSizeRatio = 0.3;
+
 	HouseExt::ExtData* pHouseExt = HouseExt::ExtMap.Find(pFactory->Owner);
 
 	auto pTypeExt = TechnoTypeExt::ExtMap.Find(pUnit->GetTechnoType());
@@ -434,6 +437,10 @@ DEFINE_HOOK(0x443CCA, BuildingClass_KickOutUnit_AircraftType_Phobos, 0xA)
 	}
 
 	HouseExt::ExtMap.Find(pHouse)->Factory_AircraftType = nullptr;
+
+	//auto pExt = TechnoExt::ExtMap.Find(pAircraft);
+	//pExt->VoxelSizeRatio = 0.3;
+
 	return 0;
 }
 

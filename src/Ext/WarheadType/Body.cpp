@@ -431,6 +431,8 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 
 	this->BreakVxl.Read(exINI, pSection, "BreakVxl");
 
+	this->BloomWH.Read(exINI, pSection, "BloomWH");
+
 	for (size_t i = 0; i < AttachAttachment_Types.size(); i++)
 	{
 		char key[0x20];
@@ -455,6 +457,7 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->AffectsEnemies.Read(exINI, pSection, "AffectsEnemies");
 	this->AffectsOwner.Read(exINI, pSection, "AffectsOwner");
 	this->IsDetachedRailgun.Read(exINI, pSection, "IsDetachedRailgun");
+	this->Flash_Duration.Read(exINI, pSection, "Flash.Duration");
 
 	{
 		this->Verses.Read(exINI, pSection, "Verses");
@@ -816,6 +819,8 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm)
 
 		.Process(this->BreakVxl)
 
+		.Process(this->BloomWH)
+
 		// Ares tags
 		.Process(this->Verses)
 		.Process(this->AffectsEnemies)
@@ -825,6 +830,7 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->Versus_HasValue)
 		.Process(this->Versus_PassiveAcquire)
 		.Process(this->Versus_Retaliate)
+		.Process(this->Flash_Duration)
 		;
 }
 

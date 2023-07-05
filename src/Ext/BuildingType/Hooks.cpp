@@ -370,42 +370,42 @@ DEFINE_HOOK(0x51EAF2, TechnoClass_WhatAction_AllowAirstrike, 0x6)
 	return SkipGameCode;
 }
 
-DEFINE_HOOK(0x706440, TechnoClass_Draw_SHP, 0x8)
-{
-	GET(TechnoClass*, pTechno, ESI);
-	GET(BlitterFlags, Flags, EDX);
-
-	if (pTechno->CurrentMission == Mission::Construction)
-	{
-		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
-		{
-			int frameBld = pBld->GetCurrentFrame(); // NACNST 0-29
-
-			if (frameBld < 15)
-				Flags |= BlitterFlags::TransLucent75;
-			else if (frameBld < 22)
-				Flags |= BlitterFlags::TransLucent50;
-			else
-				Flags |= BlitterFlags::TransLucent25;
-
-			R->EDX(Flags);
-
-			/*
-			if (auto pSHP = pBld->Type->Buildup)
-			{
-				int frameIdx = pSHP->Frames / 2 - 1;
-
-				if (frameIdx < 0)
-					frameIdx = 0;
-
-				R->ECX(frameIdx);
-			}
-			*/
-		}
-	}
-
-	return 0;
-}
+//DEFINE_HOOK(0x706440, TechnoClass_Draw_SHP, 0x8)
+//{
+//	GET(TechnoClass*, pTechno, ESI);
+//	GET(BlitterFlags, Flags, EDX);
+//
+//	if (pTechno->CurrentMission == Mission::Construction)
+//	{
+//		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
+//		{
+//			int frameBld = pBld->GetCurrentFrame(); // NACNST 0-29
+//
+//			if (frameBld < 15)
+//				Flags |= BlitterFlags::TransLucent75;
+//			else if (frameBld < 22)
+//				Flags |= BlitterFlags::TransLucent50;
+//			else
+//				Flags |= BlitterFlags::TransLucent25;
+//
+//			R->EDX(Flags);
+//
+//			/*
+//			if (auto pSHP = pBld->Type->Buildup)
+//			{
+//				int frameIdx = pSHP->Frames / 2 - 1;
+//
+//				if (frameIdx < 0)
+//					frameIdx = 0;
+//
+//				R->ECX(frameIdx);
+//			}
+//			*/
+//		}
+//	}
+//
+//	return 0;
+//}
 
 /*
 DEFINE_HOOK(0x4ABB50, DisplayClass_LeftMouseButtonUp_BeforeNetworkPlace, 0x5)
@@ -420,36 +420,36 @@ DEFINE_HOOK(0x4ABB50, DisplayClass_LeftMouseButtonUp_BeforeNetworkPlace, 0x5)
 }
 */
 
-DEFINE_HOOK(0x70644E, TechnoClass_Draw_Selling, 0x7)
-{
-	GET(TechnoClass*, pTechno, ESI);
-	GET(int, FrameIndex, ECX);
-
-	if (pTechno->CurrentMission == Mission::Selling)
-	{
-		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
-		{
-			auto pType = pBld ? pBld->Type : nullptr;
-			auto pTypeExt = pType ? BuildingTypeExt::ExtMap.Find(pType) : nullptr;
-
-			if (auto pSellBld = pTypeExt->SoldAsBuilding.Get())
-			{
-				SHPStruct* pSHP = pSellBld->Buildup;
-
-				R->EDX(pSHP);
-
-				int frameCount = pType->BuildingAnimFrame->FrameCount;
-				int frameCountSell = pSellBld->BuildingAnimFrame->FrameCount;
-
-				int frameIndexSell = FrameIndex * frameCountSell / frameCount;
-
-				R->ECX(frameIndexSell);
-			}
-		}
-	}
-
-	return 0;
-}
+//DEFINE_HOOK(0x70644E, TechnoClass_Draw_Selling, 0x7)
+//{
+//	GET(TechnoClass*, pTechno, ESI);
+//	GET(int, FrameIndex, ECX);
+//
+//	if (pTechno->CurrentMission == Mission::Selling)
+//	{
+//		if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
+//		{
+//			auto pType = pBld ? pBld->Type : nullptr;
+//			auto pTypeExt = pType ? BuildingTypeExt::ExtMap.Find(pType) : nullptr;
+//
+//			if (auto pSellBld = pTypeExt->SoldAsBuilding.Get())
+//			{
+//				SHPStruct* pSHP = pSellBld->Buildup;
+//
+//				R->EDX(pSHP);
+//
+//				int frameCount = pType->BuildingAnimFrame->FrameCount;
+//				int frameCountSell = pSellBld->BuildingAnimFrame->FrameCount;
+//
+//				int frameIndexSell = FrameIndex * frameCountSell / frameCount;
+//
+//				R->ECX(frameIndexSell);
+//			}
+//		}
+//	}
+//
+//	return 0;
+//}
 
 DEFINE_HOOK(0x7064B4, TechnoClass_Draw_Selling_Shadow, 0x7)
 {

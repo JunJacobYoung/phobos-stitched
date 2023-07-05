@@ -37,6 +37,9 @@ public:
 
 		bool SetDamageStrength = false;
 
+		int SpeedUp = 100;
+		int BloomNum = -1;
+
 		ExtData(BulletClass* OwnerObject) : Extension<BulletClass>(OwnerObject)
 			, TypeExtData { nullptr }
 			, FirerHouse { nullptr }
@@ -54,6 +57,8 @@ public:
 			, BulletDir {}
 			, InterfereToSource { false }
 			, InterfereToSelf { nullptr }
+			, SpeedUp { 120 }
+			, BloomNum { -1 }
 		{ }
 
 		virtual ~ExtData() = default;

@@ -8,6 +8,8 @@
 #include <SuperClass.h>
 #include <TechnoTypeClass.h>
 #include <JumpjetLocomotionClass.h>
+#include <Ext/HouseType/Body.h>
+#include <Ext/WeaponType/Body.h>
 
 //Static init
 
@@ -2420,6 +2422,47 @@ void HouseExt::RevealRadarSight(HouseClass* pThis)
 	}
 }
 
+void HouseExt::CallbackSW(HouseClass* pThis)
+{
+	const auto pHouseExt = HouseExt::ExtMap.Find(pThis);
+
+	int TimeLeft = pHouseExt->CallbackTimer.GetTimeLeft();
+	if (TimeLeft > 0 && !pHouseExt->CallbackSW_FrameIdx.empty())
+	{
+		//int frameIdx = pHouseExt->CallbackSW_FrameIdx[0];
+		//int frame = Unsorted::CurrentFrame;
+		//Debug::LogAndMessage("[%d]%d\n", frame, frameIdx);
+
+		if (TimeLeft == pHouseExt->CallbackSW_FrameIdx[0])
+		{
+			CoordStruct coordDest = pHouseExt->CallbackSW_Coord[0];
+
+			if (const auto pWeapon = HouseTypeExt::ExtMap.Find(pThis->Type)->CallbackSW_Weapon.Get())
+			{
+				//WeaponTypeExt::DetonateAt(pWeapon, coord, nullptr);
+				CellClass* pCell = MapClass::Instance->TryGetCellAt(coordDest);
+				if (!pCell)
+					return;
+
+				BulletClass* pBulletNew = pWeapon->Projectile->CreateBullet(pCell, nullptr, pWeapon->Damage, pWeapon->Warhead, pWeapon->Speed, pWeapon->Bright);
+
+				CoordStruct coordFrom = pHouseExt->CallbackSW_Center;
+				pBulletNew->Unlimbo(coordFrom, static_cast<DirType>(0));
+				pBulletNew->SetLocation(coordFrom);
+				pBulletNew->SourceCoords = coordFrom;
+				pBulletNew->SetTarget(pCell);
+				pBulletNew->Velocity.X = static_cast<double>(coordDest.X - coordFrom.X);
+				pBulletNew->Velocity.Y = static_cast<double>(coordDest.Y - coordFrom.Y);
+				pBulletNew->Velocity.Z = 0;
+				pBulletNew->Velocity *= pWeapon->Speed / pBulletNew->Velocity.Magnitude();
+			}
+
+			pHouseExt->CallbackSW_FrameIdx.erase(pHouseExt->CallbackSW_FrameIdx.begin());
+			pHouseExt->CallbackSW_Coord.erase(pHouseExt->CallbackSW_Coord.begin());
+		}
+	}
+}
+
 // =============================
 // load / save
 
@@ -2508,6 +2551,13 @@ void HouseExt::ExtData::Serialize(T& Stm)
 		.Process(this->RevealRadarSights_Unit)
 		.Process(this->RevealRadarSights_Aircraft)
 		.Process(this->RevealRadarSightTimers)
+		.Process(this->RecordTimer)
+		.Process(this->RecordSW_FrameIdx)
+		.Process(this->RecordSW_Pos)
+		.Process(this->CallbackSW_Coord)
+		.Process(this->CallbackTimer)
+		.Process(this->CallbackSW_FrameIdx)
+		.Process(this->CallbackSW_Center)
 		;
 }
 

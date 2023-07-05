@@ -556,6 +556,8 @@ public:
 		Valueable<bool> Parasite_NoRock;
 		ValueableVector<AttachEffectTypeClass*> Parasite_AttachEffects;
 
+		ValueableIdxVector<SuperWeaponTypeClass> DeathSW_Types;
+
 		//Ares
 		ValueableVector<TechnoTypeClass*> InitialPayload_Types;
 		ValueableVector<int> InitialPayload_Nums;
@@ -1108,6 +1110,8 @@ public:
 			, FallRate_NoParachuteMax {}
 
 			, AttackIndicator_Range { -1 }
+
+			, DeathSW_Types { }
 		{ }
 
 		virtual ~ExtData() = default;

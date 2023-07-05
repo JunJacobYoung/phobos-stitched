@@ -139,6 +139,9 @@ public:
 
 		Valueable<int> UltimateControl_Frames;
 
+		Valueable<int> Record_Duration;
+		Valueable<int> Callback_Duration;
+
 		virtual void InitializeConstants();
 
 		ExtData(SuperWeaponTypeClass* OwnerObject) : Extension<SuperWeaponTypeClass>(OwnerObject)
@@ -250,6 +253,9 @@ public:
 			, SW_ShowHealthBar_Range { -1.0 }
 
 			, UltimateControl_Frames { -1 }
+
+			, Record_Duration { 0 }
+			, Callback_Duration { 0 }
 		{ }
 
 		// Ares 0.A functions

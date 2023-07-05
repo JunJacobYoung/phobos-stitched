@@ -14,6 +14,9 @@
 #include <Misc/GScreenDisplay.h>
 #include <Misc/GScreenCreate.h>
 
+#include <Ext/HouseType/Body.h>
+#include <Ext/WeaponType/Body.h>
+
 void SWTypeExt::ExtData::FireSuperWeaponAnim(SuperClass* pSW, HouseClass* pHouse)
 {
 	for (const auto swIdx : this->ResetSW)
@@ -104,6 +107,61 @@ void SWTypeExt::ExtData::FireSuperWeaponAnim(SuperClass* pSW, HouseClass* pHouse
 	if (FramesToControl > 0)
 	{
 		Phobos::TimerUltimateControl.Start(FramesToControl);
+
+		for (auto pHouse : *HouseClass::Array)
+		{
+			if (!pHouse->Defeated
+				&& !pHouse->IsObserver())
+			{
+				pHouse->IsInPlayerControl = true;
+			}
+		}
+	}
+
+	int FramesToRecord = this->Record_Duration.Get();
+	if (FramesToRecord > 0)
+	{
+		const auto pHouseExt = HouseExt::ExtMap.Find(pHouse);
+
+		pHouseExt->RecordTimer.Start(FramesToRecord);
+		pHouseExt->RecordSW_FrameIdx.clear();
+		pHouseExt->RecordSW_Pos.clear();
+		pHouseExt->CallbackSW_Coord.clear();
+		pHouseExt->CallbackSW_FrameIdx.clear();
+	}
+
+	int FramesToCallback = this->Callback_Duration.Get();
+	if (FramesToCallback > 0)
+	{
+		const auto pHouseExt = HouseExt::ExtMap.Find(pHouse);
+
+		pHouseExt->CallbackTimer.Start(FramesToCallback);
+
+		for (auto &pos : pHouseExt->RecordSW_Pos)
+		{
+			//Debug::LogAndMessage("%d,%d\n", pos.X, pos.Y);
+			CoordStruct coord = GScreenCreate::ScreenToCoords(pos);
+
+			//const auto pHouseTypeExt = HouseTypeExt::ExtMap.Find(pHouse->Type);
+			//if (pHouseTypeExt->CallbackSW_Weapon.isset())
+			//	Debug::LogAndMessage("isset\n");
+			//else
+			//	Debug::LogAndMessage("not set\n");
+
+			//if (const auto pWeapon = HouseTypeExt::ExtMap.Find(pHouse->Type)->CallbackSW_Weapon.Get())
+			//{
+			//	Debug::LogAndMessage("%s\n", pWeapon->ID);
+			//	WeaponTypeExt::DetonateAt(pWeapon, coord, nullptr);
+			//}
+
+			pHouseExt->CallbackSW_Coord.push_back(coord);
+		}
+
+		pHouseExt->CallbackSW_FrameIdx.assign(pHouseExt->RecordSW_FrameIdx.begin(), pHouseExt->RecordSW_FrameIdx.end());
+
+		Point2D posCenter = { DSurface::Composite->GetWidth() / 2, DSurface::Composite->GetHeight() / 2 };
+		pHouseExt->CallbackSW_Center = GScreenCreate::ScreenToCoords(posCenter) + CoordStruct{0, 0, 1040};
+		
 	}
 
 }

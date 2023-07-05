@@ -4341,11 +4341,23 @@ void TechnoExt::CheckUltimateControl()
 				{
 					if (!pPre->Defeated)
 					{
-						pTechno->SetOwningHouse(pPre);
+						//pTechno->SetOwningHouse(pPre);
+
+						pTechno->MindControlledByHouse = nullptr;
 					}
 
 					pExt->HouseBeforeControlled = nullptr;
 				}
+			}
+		}
+
+		for (auto pHouse : *HouseClass::Array)
+		{
+			if (!pHouse->Defeated
+				&& !pHouse->IsObserver()
+				&& !pHouse->IsCurrentPlayer())
+			{
+				pHouse->IsInPlayerControl = false;
 			}
 		}
 	}
@@ -4615,7 +4627,13 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->VoxelSizeRatio)
 		.Process(this->expand)
 
+		.Process(this->FramesPassed)
+
 		.Process(this->HouseBeforeControlled)
+
+		.Process(this->VisualCharacterChange)
+
+		.Process(this->BloomCount)
 		;
 }
 

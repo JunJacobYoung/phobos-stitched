@@ -119,6 +119,14 @@ public:
 		std::vector<bool> RevealRadarSights_Building;
 		std::vector<CDTimerClass> RevealRadarSightTimers;
 
+		CDTimerClass RecordTimer;
+		std::vector<int> RecordSW_FrameIdx;
+		std::vector<Point2D> RecordSW_Pos;
+		std::vector<CoordStruct> CallbackSW_Coord;
+		CDTimerClass CallbackTimer;
+		std::vector<int> CallbackSW_FrameIdx;
+		CoordStruct CallbackSW_Center;
+
 		ExtData(HouseClass* OwnerObject) : Extension<HouseClass>(OwnerObject)
 			, OwnedLimboBuildingTypes {}
 			, ForceOnlyTargetHouseEnemy { false }
@@ -204,6 +212,14 @@ public:
 			, RevealRadarSights_Aircraft()
 			, RevealRadarSights_Building()
 			, RevealRadarSightTimers()
+
+			, RecordTimer()
+			, RecordSW_FrameIdx()
+			, RecordSW_Pos()
+			, CallbackSW_Coord()
+			, CallbackTimer()
+			, CallbackSW_FrameIdx()
+			, CallbackSW_Center()
 		{ }
 
 		virtual ~ExtData() = default;
@@ -276,4 +292,5 @@ public:
 	static void UnitFallActivate(HouseClass* pThis);
 	static void GapRadar(HouseClass* pThis);
 	static void RevealRadarSight(HouseClass* pThis);
+	static void CallbackSW(HouseClass* pThis);
 };

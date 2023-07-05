@@ -283,6 +283,9 @@ void WarheadTypeExt::ExtData::Detonate(TechnoClass* pOwner, HouseClass* pHouse, 
 	this->RandomBuffer = ScenarioClass::Instance->Random.RandomDouble();
 	this->HitDir = pBulletExt ? pBulletExt->BulletDir.GetValue<16>() : -1;
 
+	if (this->BloomWH.Get())
+		this->ApplyBloom(pBullet, pBullet->Target);
+
 	WeaponTypeExt::ExtData* pWeaponExt = nullptr;
 
 	if (pBullet != nullptr && pBullet->GetWeaponType() != nullptr)
@@ -1541,6 +1544,140 @@ void WarheadTypeExt::ExtData::ApplyDirectional(BulletClass* pBullet, TechnoClass
 	else//�����ܻ�
 		pTarExt->ReceiveDamageMultiplier = pTarTypeExt->DirectionalArmor_SideMultiplier.Get(pRulesExt->DirectionalArmor_SideMultiplier) *
 		this->Directional_Multiplier.Get(pRulesExt->Directional_Multiplier);
+}
+
+/*
+void WarheadTypeExt::ExtData::ApplyBloom(BulletClass* pBullet, AbstractClass* pTarget)
+{
+	if (!pBullet || this->HitDir < 0 || pBullet->Type->Vertical)
+		return;
+
+	const auto CoordTarget = pTarget->GetCoords();
+
+	const int Radius = Unsorted::LeptonsPerCell * 3;
+
+	double angle = (double)(this->HitDir) / 65536 * Math::TwoPi - Math::HalfPi;
+
+	TechnoClass* pTechno = pBullet->Owner;
+	if (!pTechno)
+		return;
+
+	auto pExt = TechnoExt::ExtMap.Find(pTechno);
+	int count = pExt->BloomCount;
+
+	double theta = angle;
+
+	if (count % 2 == 0)
+		theta += Math::Pi / count;
+
+	for (int i = 0; i < count; i++)
+	{
+		CoordStruct coordDest = { (int)(Radius * Math::cos(theta)), (int)(Radius * Math::sin(theta)), 0 };
+
+		coordDest += CoordTarget;
+		coordDest.Z = 0;
+
+		CellClass* pCell = MapClass::Instance->TryGetCellAt(coordDest);
+		if (pCell)
+			coordDest.Z = pCell->GetCoordsWithBridge().Z;
+
+		WarheadTypeExt::DetonateAt(this->BloomWH.Get(), coordDest, pBullet->Owner, 100);
+
+		LaserDrawClass* pLaser = GameCreate<LaserDrawClass>(CoordTarget, coordDest, ColorStruct { 255, 0, 0 }, ColorStruct { 0, 0, 0 }, ColorStruct { 0, 0, 0 }, 60);
+		pLaser->IsHouseColor = true;
+		pLaser->Thickness = 7;
+
+		theta += Math::TwoPi / count;
+	}
+
+	pExt->BloomCount++;
+}*/
+
+void WarheadTypeExt::ExtData::ApplyBloom(BulletClass* pBullet, AbstractClass* pTarget)
+{
+	if (!pBullet || this->HitDir < 0 || pBullet->Type->Vertical)
+		return;
+
+	const auto pBulletExt = BulletExt::ExtMap.Find(pBullet);
+
+	const auto CoordTarget = pTarget->GetCoords();
+
+	LaserDrawClass* pLaser = GameCreate<LaserDrawClass>(CoordTarget, pBullet->SourceCoords, ColorStruct { 255, 0, 0 }, ColorStruct { 0, 0, 0 }, ColorStruct { 0, 0, 0 }, 120);
+	pLaser->IsHouseColor = true;
+	pLaser->Thickness = 7;
+
+	int speedUp = pBulletExt->SpeedUp;
+	//Debug::LogAndMessage("%d\n", speedUp);
+	if (speedUp < 22)
+		return;
+
+	const int Radius = Unsorted::LeptonsPerCell * 6;
+
+	double angle = (double)(this->HitDir) / 65536 * Math::TwoPi - Math::HalfPi;
+
+	TechnoClass* pTechno = pBullet->Owner;
+	if (!pTechno)
+		return;
+
+	auto pExt = TechnoExt::ExtMap.Find(pTechno);
+	int count = pExt->BloomCount;
+
+	int bloomNum = pBulletExt->BloomNum;
+	if (bloomNum > 0)
+		count = bloomNum;
+
+	count = 2;
+
+	double theta = angle;
+
+	if (count % 2 == 0)
+		theta += Math::Pi / count;
+
+	for (int i = 0; i < count; i++)
+	{
+		CoordStruct coordDest = { (int)(Radius * Math::cos(theta)), (int)(Radius * Math::sin(theta)), 0 };
+
+		coordDest += CoordTarget;
+		coordDest.Z = 0;
+
+		CellClass* pCell = MapClass::Instance->TryGetCellAt(coordDest);
+		if (pCell)
+			coordDest.Z = pCell->GetCoordsWithBridge().Z;
+		else
+			continue;
+
+		//WarheadTypeExt::DetonateAt(this->BloomWH.Get(), coordDest, pBullet->Owner, 100);
+
+		BulletClass* pBulletNew = pBullet->Type->CreateBullet(pCell, pTechno, 1, this->BloomWH.Get(), 30, false);
+
+		//Debug::LogAndMessage("%s\n", pBullet->Type->ID);
+
+		pBulletNew->Unlimbo(CoordTarget, static_cast<DirType>(0));
+		//pBulletNew->SetLocation(CoordTarget + CoordStruct { 0, 0, 1000 });
+		//pBulletNew->SetLocation(CoordTarget + CoordStruct { 0, 0, 10 });
+		pBulletNew->SetLocation(CoordTarget);
+		pBulletNew->SourceCoords = CoordTarget;
+		pBulletNew->SetTarget(pCell);
+		pBulletNew->Velocity.X = static_cast<double>(coordDest.X - CoordTarget.X);
+		pBulletNew->Velocity.Y = static_cast<double>(coordDest.Y - CoordTarget.Y);
+		//pBulletNew->Velocity.Z = static_cast<double>(coordDest.Z - CoordTarget.Z);
+		pBulletNew->Velocity.Z = 0;
+		pBulletNew->Velocity *= 30 / pBulletNew->Velocity.Magnitude();
+		pBulletNew->Velocity.Z = speedUp;
+
+		const auto pBulletNewExt = BulletExt::ExtMap.Find(pBulletNew);
+
+		pBulletNewExt->SpeedUp = (int)(speedUp * 0.6f);
+		pBulletNewExt->BloomNum = count;
+		//LaserDrawClass* pLaser = GameCreate<LaserDrawClass>(CoordTarget, coordDest, ColorStruct { 255, 0, 0 }, ColorStruct { 0, 0, 0 }, ColorStruct { 0, 0, 0 }, 60);
+		//pLaser->IsHouseColor = true;
+		//pLaser->Thickness = 7;
+
+		theta += Math::TwoPi / count;
+	}
+
+	if (bloomNum < 0)
+		pExt->BloomCount++;
 }
 
 bool WarheadTypeExt::ExtData::ApplyReduceSWTimer(TechnoClass* pTarget)
